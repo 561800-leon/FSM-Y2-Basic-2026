@@ -8,6 +8,8 @@ public class RunState : State
 {
     protected float speed;
     protected float rotationSpeed;
+    protected Vector2 horizontalSpeed;
+    protected SpriteRenderer spriteRenderer;
 
     public RunState(PlayerScript player, StateMachine sm) : base(player, sm)
     {
@@ -15,14 +17,19 @@ public class RunState : State
 
     public override void Enter()
     {
-        speed = 3;
+        speed = 5;
         base.Enter();
+
         horizontalInput = verticalInput = 0.0f;
+        horizontalSpeed.x = 5f;
+
+        spriteRenderer = player.GetComponent<SpriteRenderer>();
+
+        player.animator.Play("Run");
 
         Debug.Log("entering running state");
-
-        player.sr.color = new Color(0.8f, 0.8f, 0.2f);
     }
+
 
     public override void Exit()
     {
@@ -45,13 +52,43 @@ public class RunState : State
             sm.ChangeState(sm.idleState);
         }
 
-        if (player.jumpAction.IsPressed())
+        if (player.jumpAction.WasPressedThisFrame() && player.isGrounded)
         {
             sm.ChangeState(sm.jumpState);
         }
 
-        //debug move gameObject
-        player.rb.linearVelocity = player.moveAction.ReadValue<Vector2>() * speed;
+        if (player.throwAction.WasPressedThisFrame())
+        {
+            sm.ChangeState(sm.throwState);
+            return;
+        }
+
+
+
+
+        if (player.rb.linearVelocityX < 0.1f && player.rb.linearVelocityX > -0.1f)
+        {
+            sm.ChangeState(sm.idleState);
+        }
+
+        Vector2 input = player.moveAction.ReadValue<Vector2>();
+
+
+        if (input.x > 0)
+        {
+            spriteRenderer.flipX = false; 
+        }
+        else if (input.x < 0)
+        {
+            spriteRenderer.flipX = true;
+        }
+
+        player.rb.linearVelocity = new Vector2(
+            input.x * speed,
+            player.rb.linearVelocity.y
+        );
+
+
 
 
         UIscript.ui.DrawText("*** This is the running state ***\n");

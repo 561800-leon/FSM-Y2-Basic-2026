@@ -12,6 +12,10 @@ public class StateMachine
     public IdleState idleState;
     public JumpState jumpState;
     public RunState runState;
+    public FallingState fallingState;
+    public ThrowState throwState;
+
+
 
 
     //constructor
@@ -21,6 +25,10 @@ public class StateMachine
         idleState = new IdleState(player, this);
         jumpState = new JumpState(player, this);
         runState = new RunState(player, this);
+        fallingState = new FallingState(player, this);
+        throwState = new ThrowState(player, this);
+
+
 
     }
 

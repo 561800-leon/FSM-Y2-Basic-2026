@@ -15,10 +15,15 @@ public class JumpState : State
 
     public override void Enter()
     {
-        Debug.Log("entering jumping state");
+        Debug.Log("Entering jumping state");
+        player.animator.Play("Jump");
 
-        player.sr.color = new Color(0.8f, 0.3f, 0.4f);  //change the sprite colour
+        player.rb.linearVelocity = new Vector2(
+            player.rb.linearVelocity.x,
+            7f
+        );
     }
+
 
     public override void Exit()
     {
@@ -35,11 +40,17 @@ public class JumpState : State
 
         }
 
-        if (player.moveAction.ReadValue<Vector2>().magnitude > 0.1f )
+        if (player.moveAction.ReadValue<Vector2>().magnitude > 0.1f)
         {
             sm.ChangeState(sm.runState);
         }
 
+        if (player.rb.linearVelocity.y < 0)
+        {
+            sm.ChangeState(sm.fallingState);
+        }
+
+        UIscript.ui.DrawText("*** This is the jumping state ***\n");
         UIscript.ui.DrawText("*** This is the jumping state ***\n");
         UIscript.ui.DrawText("Left/Right arrows = Move State");
         UIscript.ui.DrawText("E = Idle State");
